@@ -1,0 +1,82 @@
+/* Container styles */
+.container {
+  padding: 20px;
+}
+/* Navbar Container */
+.navbar {
+  background-color: #f8f9fa; /* Light background */
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Brand Styling */
+.brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007bff; /* Bootstrap Primary Color */
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: #0056b3; /* Darker shade of primary */
+}
+
+/* Nav Items */
+.navItems {
+  display: flex;
+  flex-direction: row;
+}
+
+.navLink {
+  color: #343a40; /* Bootstrap Dark Gray */
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: #007bff;
+}
+
+/* Toggler Icon */
+.navbar-toggler-icon {
+  background-color: #007bff; /* Bootstrap Primary Color */
+  border-radius: 3px;
+  padding: 3px;
+}
+
+
+/* Left Column styles */
+.leftColumn {
+  min-height: 400px; /* Ensure consistent height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center; /* Center text for small screens */
+}
+
+.inputWrapper {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px; /* Space between input and button */
+}
+
+/* Right Column styles */
+.rightColumn {
+  text-align: center;
+  margin-top: 20px; /* Adjust spacing for small screens */
+}
+
+.rightColumn img {
+  height: auto;
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .leftColumn {
+    margin-bottom: 20px;
+  }
+}

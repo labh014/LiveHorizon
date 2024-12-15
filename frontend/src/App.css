@@ -1,0 +1,65 @@
+*{
+  margin: 0;
+  padding:0;
+  box-sizing: border-box;
+}
+
+.landingPageContainer{
+  width: 100vw;
+  height: 100vh;
+  background: url("/techBackground.webp");
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: white;
+}
+
+.landingPageContainer nav {
+  display: flex;
+  justify-content: space-between;
+  padding-inline: 1.3rem;
+  padding-block: 1.3rem;
+}
+
+.landingPageContainer nav .nav-list {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.landingPageContainer nav .nav-header{
+    font-size: 1.8rem;
+    font-weight: 2rem;
+}
+
+.landingMainContainer {
+  display: flex;
+  justify-content: space-between;
+  padding-inline: 3rem;
+  height: 80vh;
+  align-items: center;
+}
+
+.landingMainContainer > div:nth-child(1){
+ font-size: 1.5rem;
+}
+
+.landingMainContainer > div:nth-child(2) img{
+  height: 70vh;
+  width: auto;
+}
+
+#start-button{
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  margin-block: 0.5rem;
+  background-color: yellow;
+  border-radius: 0.5rem;
+  border: 1px black solid;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-link p {
+  margin: 0; /* Remove any default margin */
+  padding: 0; /* Remove any default padding */
+}
+
