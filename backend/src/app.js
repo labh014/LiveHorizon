@@ -8,12 +8,15 @@ import { connectToSocket } from "./controller/serverController.js";
 import userRoutes from "./routes/userRoutes.js"
 import { checkTokenExpiry } from "./middlewares/tokenCheck.js";
 
+
 const app = express();
 const server = createServer(app);
 const io = connectToSocket(server);
 
 app.set("port", process.env.PORT || 8080);
-app.use(cors());
+app.use(cors({
+    origin: 'https://livehorizonfrontend.onrender.com'
+}));
 app.use(express.json({limit: "40kb"}));
 app.use(express.urlencoded({limit: "40kb", extended: true}));
 
