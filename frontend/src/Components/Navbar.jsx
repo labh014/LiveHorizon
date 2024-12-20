@@ -34,7 +34,7 @@ function Navbar() {
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
               {/* Home Link */}
-              <a className="nav-link">
+              <a className="nav-link cursor-pointer">
                 <div className="company_name">
                   <b>
                     <i onClick={() => navigate("/home")}>Video Call and Chat</i>
