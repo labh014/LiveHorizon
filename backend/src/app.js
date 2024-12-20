@@ -26,6 +26,7 @@ app.get("/home" , (req, res) => {
 
 const main = async () => {
   const db = await mongoose.connect("mongodb+srv://labh:KgH3wPZt4lSiDGmR@cluster0.3rdzb.mongodb.net/Cluster0")
+  console.log("conection to database is succesfully")
 }
 main();
 

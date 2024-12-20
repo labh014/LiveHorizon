@@ -19,9 +19,11 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useNavigate } from 'react-router-dom';
 import LobbyPage from './LobbyPage';
+import server from '../../environment.js';
 
 
-const serverUrl = "http://localhost:8080";
+
+const serverUrl = server;
 
 
 var connections = {};
