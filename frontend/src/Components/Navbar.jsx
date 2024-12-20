@@ -34,10 +34,10 @@ function Navbar() {
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
               {/* Home Link */}
-              <a href="/home" className="nav-link">
+              <a className="nav-link">
                 <div className="company_name">
                   <b>
-                    <i>Video Call and Chat</i>
+                    <i onClick={() => navigate("/home")}>Video Call and Chat</i>
                   </b>
                 </div>
               </a>
