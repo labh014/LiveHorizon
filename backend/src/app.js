@@ -25,6 +25,15 @@ app.use(express.urlencoded({limit: "40kb", extended: true}));
 
 app.use("/api/v1/users", userRoutes);
 
+// Serve static frontend files
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
+
+// Catch-all route for React Router
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
+});
+
 // Serve the React frontend for non-API routes
 app.get('*', (req, res) => {
   res.sendFile(path.resolve('frontend/dist/index.html'));
