@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080', // Backend URL
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },
@@ -14,5 +14,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-  }
+  },
+  // Enable history-based routing for React Router
+  base: '/',
 });
