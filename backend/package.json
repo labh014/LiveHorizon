@@ -7,13 +7,14 @@
   "scripts": {
     "dev": "nodemon src/app.js",
     "start": "node src/app.js",
-    "build:frontend": "cd ../frontend && npm install && npm run build"
+    "build:frontend": "cd ../frontend && npm install && npx run build"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "crypto": "^1.0.1",
+    "dotenv": "^16.4.7",
     "express": "^4.21.0",
     "http-status": "^1.7.4",
     "mongoose": "^8.7.0",
