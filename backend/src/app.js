@@ -23,9 +23,18 @@ const __dirname = path.dirname(__filename);
 
 
 app.set("port", process.env.PORT || 8080);
-app.use(cors({
-    origin: 'https://livehorizonfrontend.onrender.com'
-}));
+// app.use(cors({
+//     origin: 'https://livehorizonfrontend.onrender.com'
+// }));
+
+
+app.use(
+  cors({
+    origin: ["https://livehorizonfrontend.onrender.com", "http://localhost:5173"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, 
+  })
+);
 
 
 app.use(express.json({limit: "40kb"}));
@@ -38,12 +47,12 @@ app.use("/api/v1/users", userRoutes);
 // app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
 
 // Serve static files from the frontend dist folder
-app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+// app.use(express.static(path.join(__dirname, '../../frontend/dist')));
 
-// Catch-all route to serve index.html for frontend routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
-});
+// // Catch-all route to serve index.html for frontend routing
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+// });
 // // Catch-all route for React Router
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
