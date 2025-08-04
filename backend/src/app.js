@@ -30,7 +30,7 @@ app.set("port", process.env.PORT || 8080);
 
 app.use(
   cors({
-    origin: ["https://livehorizonfrontend.onrender.com", "http://localhost:5173"],
+    origin: ["https://livehorizonfrontend.onrender.com", "http://localhost:5173", "https://live-horizon.vercel.app" ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, 
   })
