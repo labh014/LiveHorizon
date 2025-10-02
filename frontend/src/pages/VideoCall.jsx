@@ -8,7 +8,6 @@ import server from '../../environment.js';
 import Controls from './VideoCall/Controls';
 import VideoGrid from './VideoCall/VideoGrid';
 import ChatPanel from './VideoCall/ChatPanel';
- 
 
 
 
@@ -43,7 +42,44 @@ function VideoCall() {
   const videoRef = useRef([]);
   const [isChatVisible, setIsChatVisible] = useState(false);
 
-  // moved to useMedia hook
+  const getPermissions = async () => {
+    try {
+      const videoPermission = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoPermission) {
+        setVideoAvailable(true);
+        // stop temp tracks used only for permission check
+        videoPermission.getTracks().forEach(track => track.stop());
+      } else {
+        setVideoAvailable(false);
+      }
+
+      const audioPermission = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (audioPermission) {
+        setAudioAvailable(true);
+        // stop temp tracks used only for permission check
+        audioPermission.getTracks().forEach(track => track.stop());
+      } else {
+        setAudioAvailable(false);
+      }
+
+      if (navigator.mediaDevices.getDisplayMedia) setScreenAvailable(true);
+      else setScreenAvailable(false);
+
+      if (videoAvailable || audioAvailable) {
+        const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: videoAvailable, audio: audioAvailable });
+        if (userMediaStream) {
+          window.localStream = userMediaStream;
+          if (localVideoRef.current) {
+            localVideoRef.current.srcObject = userMediaStream;
+          }
+        }
+      }
+
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
 
   useEffect(() => {
     getPermissions();
@@ -60,11 +96,100 @@ function VideoCall() {
     }
   }, [askForUsername]);
 
-  // hook handles stream binding; additional room logic kept below
+  const getUserMediaSuccess = (stream) => {
+    try {
+      if (window.localStream) {
+        window.localStream.getTracks().forEach(track => track.stop())
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+    window.localStream = stream;
+    localVideoRef.current.srcObject = stream;
 
-  // black/silence utilities are provided in functions/ and used in the hook
+    for (let id in connections) {
+      if (id === socketIdRef.current) continue;
+      connections[id].addStream(window.localStream);
+      connections[id].createOffer().then((description) => {
+        connections[id].setLocalDescription(description)
+          .then(() => {
+            socketRef.current.emit("signal", id, JSON.stringify({ "sdp": connections[id].localDescription }), (error) => {
+              if (error) {
+                console.log(error);
+              }
+            })
+          })
+        // .catch(error => console.log(error))
+      })
 
-  // getUserMedia handled by hook; we keep the effect that triggers it
+    }
+    stream.getTracks().forEach(track => track.onended = () => {
+      setVideo(false)
+      setAudio(false)
+
+      try {
+        const src = localVideoRef.current && localVideoRef.current.srcObject
+        if (src && src.getTracks) {
+          let tracks = src.getTracks();
+          tracks.forEach(track => track.stop())
+        }
+      } catch (error) {
+        console.log(error)
+      }
+
+      let blackSilence = (...args) => new MediaStream([black(...args), silence()])
+      window.localStream = blackSilence();
+      localVideoRef.current.srcObject = window.localStream
+
+      for (let id in connections) {
+        connections[id].addStream(window.localStream)
+        connections[id].createOffer().then((description) => {
+          connections[id].setLocalDescription(description)
+            .then(() => {
+              socketRef.current.emit("signal", id, JSON.stringify({ "sdp": connections[id].localDescription }))
+            })
+            .catch(error => console.log(error))
+        })
+      }
+    })
+  }
+
+  let silence = () => {
+    let ctx = new AudioContext();
+    let oscillator = ctx.createOscillator();
+
+    let dst = oscillator.connect(ctx.createMediaStreamDestination());
+
+    oscillator.start();
+    ctx.resume();
+    return Object.assign(dst.stream.getAudioTracks()[0], { enabled: false })
+  }
+
+  let black = ({ width = 600, height = 400 } = {}) => {
+    let canvas = Object.assign(document.createElement("canvas"), { width, height })
+    canvas.getContext("2d").fillRect(0, 0, width, height);
+    let stream = canvas.captureStream();
+    return Object.assign(stream.getVideoTracks()[0], { enabled: false })
+  }
+
+  const getUserMedia = () => {
+    if (video && videoAvailable || audio && audioAvailable) {
+      navigator.mediaDevices.getUserMedia({ video: video, audio: audio })
+        .then(getUserMediaSuccess)
+        .then((stream) => { })
+        .catch((error) => console.log(error))
+    }
+    else {
+      try {
+        let tracks = localVideoRef.current.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+      catch (error) {
+        console.log(error);
+      }
+    }
+  }
 
   
 
