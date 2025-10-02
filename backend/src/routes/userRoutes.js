@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
+import { v2 as cloudinary } from 'cloudinary'
 import { fileURLToPath } from 'url'
 import { login, register, getHistory, addHistory, me, logout, updateProfile } from "../controller/userController.js";
 import { checkTokenExpiry } from "../middlewares/tokenCheck.js";
@@ -53,6 +54,23 @@ router.route("/profile/avatar").post(checkTokenExpiry, (req, res) => {
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' })
       }
+      // If Cloudinary env is set, upload to Cloudinary
+      if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+        cloudinary.config({
+          cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+          api_key: process.env.CLOUDINARY_API_KEY,
+          api_secret: process.env.CLOUDINARY_API_SECRET
+        })
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'livehorizon/avatars',
+          resource_type: 'image',
+          overwrite: true
+        })
+        req.user.avatarUrl = result.secure_url
+        await req.user.save()
+        return res.status(200).json({ avatarUrl: req.user.avatarUrl })
+      }
+      // fallback to local storage
       const rel = `/uploads/avatars/${req.file.filename}`
       req.user.avatarUrl = rel
       await req.user.save()
