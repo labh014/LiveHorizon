@@ -1,4 +1,5 @@
 import { User} from "../models/userModel.js"
+import multer from 'multer'
 import { Meeting} from "../models/meetingModel.js"
 
 import bcrypt from 'bcrypt'
@@ -44,15 +45,15 @@ const login = async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
-      const token = crypto.randomBytes(20).toString("hex");
+      const token = crypto.randomBytes(32).toString("hex");
       const tokenExpiry = new Date();
-      tokenExpiry.setDate(tokenExpiry.getDate() + 1); // Set expiry to 1 day from now
+      tokenExpiry.setDate(tokenExpiry.getDate() + 1); // 1 day
 
       user.token = token;
       user.tokenExpiry = tokenExpiry;
       await user.save();
 
-      return res.status(httpStatus.OK).json({ token: token });
+      return res.status(httpStatus.OK).json({ token });
     } else {
       return res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid credentials" });
     }
@@ -61,48 +62,70 @@ const login = async (req, res) => {
   }
 };
 
-
-const getHistory = async (req, res) => {
-  const { token } = req.query;
+const me = async (req, res) => {
   try {
-    console.log(token)
-    const user = await User.findOne({ token: token });
-    console.log(user)
-    const meeting = await Meeting.find({ userId: user.username });
-    console.log("labh")
-    
-    console.log(meeting)
-    res.json(meeting)
-
-  }
-  catch (error) {
+    const user = req.user;
+    return res.status(httpStatus.OK).json({
+      name: user.name,
+      username: user.username,
+      avatarUrl: user.avatarUrl || ''
+    });
+  } catch (error) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Something went wrong" });
   }
+}
 
+const logout = async (req, res) => {
+  try {
+    const user = req.user;
+    user.token = null;
+    user.tokenExpiry = null;
+    await user.save();
+    return res.status(httpStatus.OK).json({ message: "Logged out" });
+  } catch (error) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Something went wrong" });
+  }
+}
+const updateProfile = async (req, res) => {
+  try {
+    const user = req.user;
+    const { name, avatarUrl } = req.body;
+    if (typeof name === 'string' && name.trim()) {
+      user.name = name.trim();
+    }
+    if (typeof avatarUrl === 'string') {
+      user.avatarUrl = avatarUrl;
+    }
+    await user.save();
+    return res.status(httpStatus.OK).json({ message: 'Profile updated', user: { name: user.name, username: user.username, avatarUrl: user.avatarUrl || '' } });
+  } catch (error) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' });
+  }
+}
+
+
+const getHistory = async (req, res) => {
+  try {
+    const user = req.user;
+    const meeting = await Meeting.find({ userId: user.username });
+    return res.json(meeting);
+  } catch (error) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Something went wrong" });
+  }
 }
 
 const addHistory = async (req, res) => {
-  const { token, meeting_code } = req.body;
+  const { meeting_code } = req.body;
   try {
-    
-    const user = await User.findOne({ token: token })
-    console.log(user)
-    const newMeeting = new Meeting(
-      {
-        userId: user.username,
-        meetingCode: meeting_code
-        
-      }
-    )
-    console.log("labhlabhlabh")
-    console.log(user, meeting_code)
+    const user = req.user;
+    const newMeeting = new Meeting({
+      userId: user.username,
+      meetingCode: meeting_code
+    });
     await newMeeting.save();
-    
     return res.status(httpStatus.CREATED).json({ message: "History added" })
-
+  } catch (e) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: `Something went wrong ${e}` })
   }
-  catch (e) {
-    res.json({ message: `Something went wrong ${e}` })
 }
-}
-export { login, register, getHistory, addHistory }
+export { login, register, getHistory, addHistory, me, logout, updateProfile }

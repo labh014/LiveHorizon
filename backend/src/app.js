@@ -23,10 +23,6 @@ const __dirname = path.dirname(__filename);
 
 
 app.set("port", process.env.PORT || 8080);
-// app.use(cors({
-//     origin: 'https://livehorizonfrontend.onrender.com'
-// }));
-
 
 app.use(
   cors({
@@ -40,29 +36,11 @@ app.use(
 app.use(express.json({limit: "40kb"}));
 app.use(express.urlencoded({limit: "40kb", extended: true}));
 
+// Serve uploaded avatars statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use("/api/v1/users", userRoutes);
 
-// // Serve static frontend files
-// const __dirname = path.resolve();
-// app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
-
-// Serve static files from the frontend dist folder
-// app.use(express.static(path.join(__dirname, '../../frontend/dist')));
-
-// // Catch-all route to serve index.html for frontend routing
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
-// });
-// // Catch-all route for React Router
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
-// });
-
-
-// Serve the React frontend for non-API routes
-// app.get('*', (req, res) => {
-//   res.sendFile(path.resolve('frontend/dist/index.html'));
-// });
 
 
 app.get("/home" , (req, res) => {
@@ -70,9 +48,13 @@ app.get("/home" , (req, res) => {
 })
 
 const main = async () => {
+  console.log("DATABASE_URL:", process.env.DATABASE_URL);
+  console.log("conection to database is under progress")
   const db = await mongoose.connect(process.env.DATABASE_URL)
+  
   console.log("conection to database is succesfully")
 }
+
 main();
 
 server.listen(PORT, () => {

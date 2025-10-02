@@ -1,25 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import io from "socket.io-client";
-import { backdropClasses, Badge } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
 import styles from '../style/videoCall.module.css'
-import Auth from '../utils/Auth'
-
-import VideocamIcon from '@mui/icons-material/VideocamOutlined';
-import VideocamOffIcon from '@mui/icons-material/VideocamOff';
-import CallEndIcon from '@mui/icons-material/CallEnd';
-import MicIcon from '@mui/icons-material/Mic';
-import MessageIcon from '@mui/icons-material/Message';
-import ScreenShareIcon from '@mui/icons-material/ScreenShare';
-import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
-import MicOffIcon from '@mui/icons-material/MicOff';
-import ChatIcon from '@mui/icons-material/Chat';
 import { useNavigate } from 'react-router-dom';
 import LobbyPage from './LobbyPage';
 import server from '../../environment.js';
+import Controls from './VideoCall/Controls';
+import VideoGrid from './VideoCall/VideoGrid';
+import ChatPanel from './VideoCall/ChatPanel';
 
 
 
@@ -53,16 +41,28 @@ function VideoCall() {
   let [videos, setVideos] = useState([]);
   const videoRef = useRef([]);
   const [isChatVisible, setIsChatVisible] = useState(false);
+  const [panelWidth, setPanelWidth] = useState(360);
+  const [isNarrow, setIsNarrow] = useState(false);
 
   const getPermissions = async () => {
     try {
       const videoPermission = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoPermission) setVideoAvailable(true);
-      else setVideoAvailable(false);
+      if (videoPermission) {
+        setVideoAvailable(true);
+        // stop temp tracks used only for permission check
+        videoPermission.getTracks().forEach(track => track.stop());
+      } else {
+        setVideoAvailable(false);
+      }
 
       const audioPermission = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (audioPermission) setAudioAvailable(true);
-      else setAudioAvailable(false);
+      if (audioPermission) {
+        setAudioAvailable(true);
+        // stop temp tracks used only for permission check
+        audioPermission.getTracks().forEach(track => track.stop());
+      } else {
+        setAudioAvailable(false);
+      }
 
       if (navigator.mediaDevices.getDisplayMedia) setScreenAvailable(true);
       else setScreenAvailable(false);
@@ -85,6 +85,19 @@ function VideoCall() {
 
   useEffect(() => {
     getPermissions();
+    const handleResize = () => {
+      const w = window.innerWidth;
+      const narrow = w < 768;
+      setIsNarrow(narrow);
+      setPanelWidth(narrow ? w : 360);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      // cleanup on unmount
+      cleanupMediaAndConnections();
+      window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   const getUserMediaSuccess = (stream) => {
@@ -188,10 +201,15 @@ function VideoCall() {
 
 
   const addMessage = (data, sender, socketIdSender) => {
-    setMessages((prevMessages) => [...prevMessages, {data: data, sender: sender}])
-    if(socketIdSender !== socketIdRef.current){
+    // Skip duplicate echo of my own message (we already add it optimistically)
+    if (socketIdSender === socketIdRef.current) {
+      return;
+    }
+    setMessages((prevMessages) => [...prevMessages, { data, sender }])
+    if (socketIdSender !== socketIdRef.current) {
       setNewMessages((prevMessages) => prevMessages + 1)
-    } 
+    }
+    if (!isChatVisible) setIsChatVisible(true);
   }
   
 
@@ -403,8 +421,58 @@ function VideoCall() {
   };
   // Send Message
   const sendMesage = () => {
-    socketRef.current.emit("chat-message", message, username)
-    setMessage("")
+    if (!message || message.trim() === '') return;
+    // Optimistically add the message so the sender sees it immediately
+    setMessages((prev) => [...prev, { data: message, sender: username || 'You' }]);
+    socketRef.current.emit("chat-message", message, username);
+    setMessage("");
+    if (!isChatVisible) setIsChatVisible(true);
+  }
+
+  const cleanupMediaAndConnections = () => {
+    try {
+      // stop local media tracks
+      if (localVideoRef.current && localVideoRef.current.srcObject) {
+        const tracks = localVideoRef.current.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        localVideoRef.current.srcObject = null;
+      }
+      if (window.localStream) {
+        try {
+          window.localStream.getTracks().forEach(track => track.stop());
+        } catch (_) {}
+        window.localStream = null;
+      }
+
+      // close all peer connections
+      for (let id in connections) {
+        try {
+          const pc = connections[id];
+          if (pc.getSenders) {
+            pc.getSenders().forEach(sender => {
+              try { sender.track && sender.track.stop(); } catch (_) {}
+            });
+          }
+          pc.close && pc.close();
+        } catch (_) {}
+        delete connections[id];
+      }
+
+      // disconnect socket
+      if (socketRef.current) {
+        try {
+          socketRef.current.removeAllListeners && socketRef.current.removeAllListeners();
+        } catch (_) {}
+        try { socketRef.current.disconnect && socketRef.current.disconnect(); } catch (_) {}
+      }
+
+      setScreen(false);
+      setVideo(false);
+      setAudio(false);
+      setIsChatVisible(false);
+    } catch (e) {
+      console.log('Cleanup error', e)
+    }
   }
   const connect = () => {
     if (username.trim() !== "") {
@@ -416,15 +484,7 @@ function VideoCall() {
   };
   let route = useNavigate();
   const handleEndCall = () => {
-    try
-    {
-      let tracks = localVideoRef.current.srcObject.getTracks();
-      tracks.forEach((track) => track.stop())
-    }
-    catch(error){
-      console.log(`Something wrong in ending call ${error}`)
-    }
-
+    cleanupMediaAndConnections();
     route('/home')
   }
   return (
@@ -439,86 +499,65 @@ function VideoCall() {
         //     </video>
         //   </div>
         // </div>
-        <LobbyPage username={username} setUsername={setUsername} connect={connect} localVideoRef={localVideoRef} />
+        <LobbyPage
+          username={username}
+          setUsername={setUsername}
+          connect={connect}
+          localVideoRef={localVideoRef}
+          video={video}
+          setVideo={setVideo}
+          audio={audio}
+          setAudio={setAudio}
+        />
 
         
 
         :
         <div className={styles.videoCallContainer}>
 
-          <div className={styles.buttonContainer}>
-            <IconButton style={{ color: "grey" }} onClick={handleVideo}>
-              {(video === true) ? <VideocamIcon /> : <VideocamOffIcon />}
-            </IconButton>
-
-
-            <IconButton style={{ color: "grey" }} onClick={handleAudio}>
-              {audio === true ? <MicIcon /> : <MicOffIcon />}
-            </IconButton>
-
-            {
-              screenAvailable === true ? <IconButton onClick={handleScreen} style={{ color: "grey" }}>
-                {screen === true ? <ScreenShareIcon /> : <StopScreenShareIcon />}
-              </IconButton> : <></>
-            }
-
-            <Badge badgeContent={newMessages} max={500} color='primary'>
-              <IconButton onClick={toggleChat} style={{ color: "grey" }}  >
-                <ChatIcon />
-              </IconButton>
-
-            </Badge>
-            <IconButton style={{ color: "red" }} onClick={handleEndCall}>
-              <CallEndIcon />
-            </IconButton>
-          </div>
-          <video className={styles.videoConfrenece} ref={localVideoRef} autoPlay muted></video>
-          <div className={styles.VideoRoom}>
-            {videos.map((video) => (
-              <div key={video.socketId}>
-                {/* <h1>{video.socketId}</h1> */}
-                <video
-                  style={{ width: '264px', height: '199px', minWidth: '80px', borderRadius: '0.8rem' }}
-                  data-socket={video.socketId}
-                  ref={ref => {
-                    if (ref && video.stream) ref.srcObject = video.stream;
-                  }}
-                  autoPlay
-
-                />
-              </div>
-            ))}
-
-
-          </div>
-
-          {isChatVisible && (
-            <div className={styles.chatContainer}>
-              <h2>Chat Container</h2>
-              {messages.length}
-              <div className={styles.chats}>
-                {messages.map((item, index) => {
-                  return (
-                    <>
-                      <p><b>{item.sender}</b>
-                      </p>
-                      <p>{item.data}</p>
-                    </>
-                  )
-                  
-                })}
-              </div>
-              <div className={styles.input}>
-                <TextField id="standard-basic" label="Chat" variant="standard" value={message} onChange={(e) => { setMessage(e.target.value) }} />
-              </div>
-              <div className={styles.button}>
-                <Button variant="contained" onClick={sendMesage}>Send</Button>
-              </div>
-
-
-              {/* Add more chat UI components as needed */}
+          <Controls
+            video={video}
+            audio={audio}
+            screenAvailable={screenAvailable === true}
+            screen={screen}
+            onToggleVideo={handleVideo}
+            onToggleAudio={handleAudio}
+            onToggleScreen={handleScreen}
+            onToggleChat={toggleChat}
+            newMessages={newMessages}
+            onEnd={handleEndCall}
+          />
+          <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', position: 'relative' }}>
+            <div style={{ flex: 1, position: 'relative', paddingRight: (!isNarrow && isChatVisible) ? panelWidth : 0 }}>
+              <VideoGrid videos={videos} />
+              <video
+                ref={localVideoRef}
+                autoPlay
+                muted
+                style={{
+                  position: 'fixed',
+                  right: (!isNarrow && isChatVisible) ? (panelWidth + 16) : 16,
+                  bottom: 16,
+                  width: isNarrow ? 140 : 220,
+                  height: isNarrow ? 88 : 124,
+                  borderRadius: 12,
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.25)',
+                  background: '#000',
+                  zIndex: 5
+                }}
+              />
             </div>
-          )}
+            {isChatVisible && (
+              <ChatPanel
+                messages={messages}
+                message={message}
+                setMessage={setMessage}
+                onSend={sendMesage}
+                currentUser={username || 'You'}
+                panelWidth={panelWidth}
+              />
+            )}
+          </div>
 
 
 
@@ -533,4 +572,4 @@ function VideoCall() {
   )
 }
 
-export default Auth(VideoCall)
+export default VideoCall

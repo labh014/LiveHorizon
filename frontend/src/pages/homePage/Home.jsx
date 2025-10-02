@@ -1,11 +1,9 @@
 import React, { useContext, useState } from 'react';
-import Auth from '../../utils/Auth';
 import styles from '../../style/homePage.module.css'; // Import the CSS module
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import { AuthContext } from '../../contexts/AuthContext';
-import Navbar from '../../Components/Navbar';
 
 function Home() {
   let navigate = useNavigate();
@@ -19,9 +17,12 @@ function Home() {
 
   return (
     <>
-      <Navbar />
       <div className={styles.container}>
         <div className="row align-items-center">
+          <div className="col-12 text-center mb-4">
+            <h3>Start or Join a Meeting</h3>
+            <p className="text-muted">Enter a meeting code to jump in.</p>
+          </div>
           {/* Left Column */}
           <div className={`col-lg-6 col-md-12 ${styles.leftColumn}`}>
             <div className={styles.inputWrapper}>
@@ -52,4 +53,4 @@ function Home() {
   );
 }
 
-export default Auth(Home);
+export default Home;

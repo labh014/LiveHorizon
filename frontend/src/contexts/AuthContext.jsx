@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { createContext, useState, useContext } from 'react'
+import { createContext, useState, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 
 import httpStatus from 'http-status'
@@ -11,10 +11,30 @@ const client = axios.create({
   baseURL: `${server}/api/v1/users`
 })
 
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/auth';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const AuthProvider = ({children}) => {
   const  authContext = useContext(AuthContext);
 
   const [userData, setUserData] = useState(authContext)
+  const [loading, setLoading] = useState(true)
 
   const handleRegister = async (name, username, password) => {
     try
@@ -42,26 +62,56 @@ export const AuthProvider = ({children}) => {
       });
       if (request.status === httpStatus.OK) {
         localStorage.setItem("token", request.data.token);
-        setTimeout(() => {
-          localStorage.removeItem("token");
-          alert("Session expired. Please log in again.");
-        }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
       }
       console.log(request);
     } catch (error) {
       throw error;
     }
   };
+
+  const fetchMe = async () => {
+    try {
+      const response = await client.get('/me')
+      setUserData(response.data)
+    } catch (error) {
+      // handled by interceptor on 401
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateProfile = async ({ name, avatarUrl }) => {
+    const response = await client.put('/profile', { name, avatarUrl })
+    setUserData(response.data.user)
+    return response.data
+  }
+
+  const logout = async () => {
+    try {
+      await client.post('/logout')
+    } catch (e) {
+      // ignore
+    } finally {
+      localStorage.removeItem('token')
+      window.location.href = '/auth'
+    }
+  }
+
+  const isAuthenticated = () => !!localStorage.getItem('token')
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchMe()
+    } else {
+      setLoading(false)
+    }
+  }, [])
   
 
   const getHistory = async () => {
     try
     {
-      const request = await client.get("/get-to-history",
-        {params: {
-          token : localStorage.getItem('token')
-        }}
-      );
+      const request = await client.get("/get-to-history");
       return request.data;
 
     }
@@ -77,7 +127,6 @@ export const AuthProvider = ({children}) => {
       console.log("labh;ajlkdjflk")
       let request = await client.post("/add-to-history",
         {
-          token : localStorage.getItem("token"),
           meeting_code : meetingCode,
           
         }
@@ -94,7 +143,7 @@ export const AuthProvider = ({children}) => {
   const router = useNavigate();
 
   const data = {
-    userData, setUserData, handleRegister, handleLogin, addToHistory, getHistory
+    userData, setUserData, handleRegister, handleLogin, addToHistory, getHistory, logout, loading, isAuthenticated, updateProfile
   }
 
   return (
