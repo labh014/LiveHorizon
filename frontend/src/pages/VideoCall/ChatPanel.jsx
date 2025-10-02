@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { Button, TextField } from '@mui/material'
 
-function ChatPanel({ messages, message, setMessage, onSend, currentUser, panelWidth = 360 }) {
+function ChatPanel({ messages, message, setMessage, onSend, currentUser }) {
   const listRef = useRef(null)
 
   useEffect(() => {
@@ -11,7 +11,7 @@ function ChatPanel({ messages, message, setMessage, onSend, currentUser, panelWi
   }, [messages])
 
   return (
-    <div style={{ width: panelWidth, background: '#ffffff', borderLeft: '1px solid #e9ecef', height: '100vh', display: 'flex', flexDirection: 'column', position: 'fixed', right: 0, top: 0 }}>
+    <div style={{ width: 360, background: '#ffffff', borderLeft: '1px solid #e9ecef', height: '100vh', display: 'flex', flexDirection: 'column', position: 'fixed', right: 0, top: 0 }}>
       <div style={{ padding: '12px 16px', borderBottom: '1px solid #e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h6 style={{ margin: 0 }}>Chat</h6>
         <span style={{ fontSize: 12, color: '#6c757d' }}>{messages.length} messages</span>

@@ -41,8 +41,6 @@ function VideoCall() {
   let [videos, setVideos] = useState([]);
   const videoRef = useRef([]);
   const [isChatVisible, setIsChatVisible] = useState(false);
-  const [panelWidth, setPanelWidth] = useState(360);
-  const [isNarrow, setIsNarrow] = useState(false);
 
   const getPermissions = async () => {
     try {
@@ -85,24 +83,24 @@ function VideoCall() {
 
   useEffect(() => {
     getPermissions();
-    const handleResize = () => {
-      const w = window.innerWidth;
-      const narrow = w < 768;
-      setIsNarrow(narrow);
-      setPanelWidth(narrow ? w : 360);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
     return () => {
       // cleanup on unmount
       cleanupMediaAndConnections();
-      window.removeEventListener('resize', handleResize);
     }
   }, []);
 
+  // Ensure self preview binds when entering the call view
+  useEffect(() => {
+    if (!askForUsername && window.localStream && localVideoRef.current) {
+      localVideoRef.current.srcObject = window.localStream;
+    }
+  }, [askForUsername]);
+
   const getUserMediaSuccess = (stream) => {
     try {
-      window.localStream.getTracks().forEach(track => track.stop())
+      if (window.localStream) {
+        window.localStream.getTracks().forEach(track => track.stop())
+      }
     }
     catch (error) {
       console.log(error)
@@ -131,10 +129,12 @@ function VideoCall() {
       setAudio(false)
 
       try {
-        let tracks = localVideoRef.current.srcObject.getTracks();
-        tracks.forEach(track => track.stop())
-      }
-      catch (error) {
+        const src = localVideoRef.current && localVideoRef.current.srcObject
+        if (src && src.getTracks) {
+          let tracks = src.getTracks();
+          tracks.forEach(track => track.stop())
+        }
+      } catch (error) {
         console.log(error)
       }
 
@@ -190,6 +190,8 @@ function VideoCall() {
       }
     }
   }
+
+  
 
   useEffect(() => {
     if (video !== undefined && audio !== undefined) getUserMedia();
@@ -528,18 +530,19 @@ function VideoCall() {
             onEnd={handleEndCall}
           />
           <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', position: 'relative' }}>
-            <div style={{ flex: 1, position: 'relative', paddingRight: (!isNarrow && isChatVisible) ? panelWidth : 0 }}>
+            <div style={{ flex: 1, position: 'relative' }}>
               <VideoGrid videos={videos} />
               <video
                 ref={localVideoRef}
                 autoPlay
                 muted
+                playsInline
                 style={{
                   position: 'fixed',
-                  right: (!isNarrow && isChatVisible) ? (panelWidth + 16) : 16,
+                  right: isChatVisible ? (360 + 16) : 16,
                   bottom: 16,
-                  width: isNarrow ? 140 : 220,
-                  height: isNarrow ? 88 : 124,
+                  width: 220,
+                  height: 124,
                   borderRadius: 12,
                   boxShadow: '0 8px 20px rgba(0,0,0,0.25)',
                   background: '#000',
@@ -554,7 +557,6 @@ function VideoCall() {
                 setMessage={setMessage}
                 onSend={sendMesage}
                 currentUser={username || 'You'}
-                panelWidth={panelWidth}
               />
             )}
           </div>
