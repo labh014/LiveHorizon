@@ -551,13 +551,27 @@ function VideoCall() {
               />
             </div>
             {isChatVisible && (
-              <ChatPanel
-                messages={messages}
-                message={message}
-                setMessage={setMessage}
-                onSend={sendMesage}
-                currentUser={username || 'You'}
-              />
+              <>
+                {/* Backdrop on small screens to allow tap-to-close */}
+                <div
+                  onClick={() => setIsChatVisible(false)}
+                  style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.2)',
+                    zIndex: 5,
+                    display: window.matchMedia && window.matchMedia('(max-width: 768px)').matches ? 'block' : 'none'
+                  }}
+                />
+                <ChatPanel
+                  messages={messages}
+                  message={message}
+                  setMessage={setMessage}
+                  onSend={sendMesage}
+                  currentUser={username || 'You'}
+                  onClose={() => setIsChatVisible(false)}
+                />
+              </>
             )}
           </div>
 
