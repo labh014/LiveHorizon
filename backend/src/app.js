@@ -9,7 +9,14 @@ import userRoutes from "./routes/userRoutes.js"
 import { checkTokenExpiry } from "./middlewares/tokenCheck.js";
 import { fileURLToPath } from "node:url";
 import path from 'path';
-import 'dotenv/config'; 
+import dotenv from "dotenv";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
+
 const PORT = process.env.PORT || 8080;
 
 
@@ -17,12 +24,6 @@ const PORT = process.env.PORT || 8080;
 const app = express();
 const server = createServer(app);
 const io = connectToSocket(server);
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
-app.set("port", process.env.PORT || 8080);
 
 app.use(
   cors({
@@ -57,7 +58,7 @@ const main = async () => {
 
 main();
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Listening on port 8080 ${PORT}`);
 })
 
