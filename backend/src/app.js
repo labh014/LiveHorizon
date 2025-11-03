@@ -44,8 +44,8 @@ app.use("/api/v1/users", userRoutes);
 
 
 
-app.get("/home" , (req, res) => {
-  return res.json({"Hello" : "world"});
+app.get("/" , (req, res) => {
+  return res.json({"message": "Live Horizon Backend is running"});
 })
 
 const main = async () => {
