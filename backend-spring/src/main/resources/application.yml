@@ -1,0 +1,77 @@
+server:
+  port: ${PORT:8080}
+  address: 0.0.0.0
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: livehorizon-backend
+  # Keeps the existing deployment working: the Node backend read backend/.env,
+  # this imports the same KEY=value file when it is present.
+  config:
+    import: optional:file:.env[.properties]
+  data:
+    mongodb:
+      uri: ${DATABASE_URL}
+      auto-index-creation: true
+  servlet:
+    multipart:
+      # Deliberately above app.storage.max-size so the service can return a
+      # clean 413 with a message instead of a container-level failure.
+      max-file-size: 8MB
+      max-request-size: 10MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    com.livehorizon: INFO
+
+app:
+  cors:
+    allowed-origins:
+      - https://livehorizonfrontend.onrender.com
+      - https://live-horizon.vercel.app
+      - http://localhost:5173
+      - http://localhost:4173
+  auth:
+    # Sliding inactivity window, same as the Node middleware.
+    token-ttl: 1d
+    # Only rewrite tokenExpiry when the last refresh is older than this,
+    # instead of one Mongo write per authenticated request.
+    refresh-threshold: 1h
+    login-max-attempts: 10
+    login-window: 5m
+  socket:
+    enabled: true
+    hostname: 0.0.0.0
+    port: ${SOCKET_PORT:9092}
+    context: /socket.io
+    # Flip to true once the frontend sends ?token=<auth token> on connect.
+    require-auth: false
+    chat-history-limit: 200
+    ping-interval: 25s
+    ping-timeout: 60s
+  storage:
+    local-dir: ${UPLOAD_DIR:./uploads}
+    avatar-subdir: avatars
+    public-base-path: /uploads
+    allowed-content-types:
+      - image/png
+      - image/jpeg
+    max-size: 5MB
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
+    folder: livehorizon/avatars
