@@ -1,0 +1,112 @@
+.profileCard {
+  font-family: 'Inter', sans-serif;
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #f1f3f4;
+  padding-bottom: 8px;
+}
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.avatarWrapper {
+  position: relative;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.avatarWrapper:hover {
+  transform: scale(1.02);
+}
+
+.avatarOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 20px;
+}
+
+.avatarWrapper:hover .avatarOverlay {
+  opacity: 1;
+}
+
+/* Personal Code copy widget */
+.personalLinkCard {
+  background-color: #f8f9fa;
+  border: 1px dashed #dadce0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.personalLinkInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.personalLinkLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.personalLinkUrl {
+  font-size: 14px;
+  color: #202124;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btnCopy {
+  background: transparent;
+  border: none;
+  color: #1a73e8;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.btnCopy:hover {
+  background-color: rgba(26,115,232,0.08);
+}

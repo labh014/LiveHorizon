@@ -22,7 +22,8 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error?.response?.status === 401) {
+    const isAuthEndpoint = error?.config?.url?.endsWith('/login') || error?.config?.url?.endsWith('/register');
+    if (error?.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('token');
       window.location.href = '/auth';
     }

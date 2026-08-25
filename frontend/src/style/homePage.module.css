@@ -1,82 +1,361 @@
-/* Container styles */
 .container {
-  padding: 20px;
-}
-/* Navbar Container */
-.navbar {
-  background-color: #f8f9fa; /* Light background */
-  padding: 0.5rem 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  font-family: 'Inter', sans-serif;
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  padding: 60px 24px;
 }
 
-/* Brand Styling */
-.brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #007bff; /* Bootstrap Primary Color */
-  text-decoration: none;
-}
-
-.brand:hover {
-  color: #0056b3; /* Darker shade of primary */
-}
-
-/* Nav Items */
-.navItems {
-  display: flex;
-  flex-direction: row;
-}
-
-.navLink {
-  color: #343a40; /* Bootstrap Dark Gray */
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-}
-
-.navLink:hover {
-  color: #007bff;
-}
-
-/* Toggler Icon */
-.navbar-toggler-icon {
-  background-color: #007bff; /* Bootstrap Primary Color */
-  border-radius: 3px;
-  padding: 3px;
-}
-
-
-/* Left Column styles */
 .leftColumn {
-  min-height: 400px; /* Ensure consistent height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcomeTitle {
+  font-size: 40px;
+  font-weight: 500;
+  color: #202124;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+}
+
+.welcomeSubtitle {
+  font-size: 18px;
+  color: #5f6368;
+  line-height: 1.5;
+  margin-bottom: 40px;
+}
+
+/* Actions block */
+.actionGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.btnNewMeeting {
+  background-color: #1a73e8;
+  color: #ffffff !important;
+  border: none;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3);
+  transition: background-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.btnNewMeeting:hover {
+  background-color: #1557b0;
+  box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btnOutline {
+  border: 1px solid #dadce0;
+  background-color: #ffffff;
+  color: #1a73e8 !important;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.btnOutline:hover {
+  background-color: #f8f9fa;
+}
+
+/* Dropdown styling */
+.dropdownMenu {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  width: 250px;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownItem {
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #3c4043;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #f1f3f4;
+}
+
+.dropdownItem i {
+  color: #5f6368;
+  font-size: 16px;
+}
+
+/* Meeting Code Form */
+.joinGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 240px;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5f6368;
+}
+
+.codeInput {
+  width: 100%;
+  padding: 11px 14px 11px 40px;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #3c4043;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.codeInput:focus {
+  border-color: #1a73e8;
+}
+
+.btnJoin {
+  background: transparent;
+  border: none;
+  color: #1a73e8;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 11px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.btnJoin:hover {
+  background-color: rgba(26,115,232,0.06);
+}
+
+.btnJoin:disabled {
+  color: #c2c3c5;
+  cursor: not-allowed;
+}
+
+/* Right Column Card Promo */
+.rightColumn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cardPromo {
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.timeDisplay {
+  border-bottom: 1px solid #f1f3f4;
+  padding-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+.digitalClock {
+  font-size: 32px;
+  font-weight: 500;
+  color: #202124;
+}
+
+.dateText {
+  font-size: 14px;
+  color: #5f6368;
+  margin-top: 4px;
+}
+
+/* Carousel/Slides */
+.slideContent {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center; /* Center text for small screens */
+  padding: 10px 0;
 }
 
-.inputWrapper {
-  width: 100%;
-  max-width: 400px;
-  margin-bottom: 20px; /* Space between input and button */
+.slideImg {
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 20px;
 }
 
-/* Right Column styles */
-.rightColumn {
-  text-align: center;
-  margin-top: 20px; /* Adjust spacing for small screens */
+.slideTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #202124;
+  margin-bottom: 8px;
 }
 
-.rightColumn img {
-  height: auto;
-  max-width: 100%;
-  border-radius: 10px;
+.slideText {
+  font-size: 13px;
+  color: #5f6368;
+  line-height: 1.4;
+  max-width: 280px;
+  margin: 0 auto;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Dot Indicators */
+.carouselDots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 15px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #dadce0;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.dotActive {
+  background-color: #1a73e8;
+  transform: scale(1.2);
+}
+
+/* Copy Link Popover Overlay */
+.popoverOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+
+.popoverCard {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  width: 90%;
+  max-width: 420px;
+  position: relative;
+  text-align: left;
+}
+
+.popoverHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.popoverHeader h5 {
+  margin: 0;
+  font-weight: 600;
+  color: #202124;
+}
+
+.popoverClose {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #5f6368;
+  cursor: pointer;
+}
+
+.popoverCopyBar {
+  display: flex;
+  align-items: center;
+  background-color: #f1f3f4;
+  border-radius: 6px;
+  padding: 8px 12px;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.popoverLinkText {
+  flex-grow: 1;
+  font-size: 14px;
+  color: #3c4043;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btnCopy {
+  background: transparent;
+  border: none;
+  color: #1a73e8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.btnCopy:hover {
+  background-color: rgba(26,115,232,0.1);
+}
+
+@media (max-width: 991px) {
   .leftColumn {
-    margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .actionGroup {
+    justify-content: center;
+  }
+  .dropdownMenu {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .joinGroup {
+    justify-content: center;
   }
 }

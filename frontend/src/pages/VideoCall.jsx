@@ -4,14 +4,14 @@ import io from "socket.io-client";
 import styles from '../style/videoCall.module.css'
 import { useNavigate } from 'react-router-dom';
 import LobbyPage from './LobbyPage';
-import server from '../../environment.js';
+import server, { socketServer } from '../../environment.js';
 import Controls from './VideoCall/Controls';
 import VideoGrid from './VideoCall/VideoGrid';
 import ChatPanel from './VideoCall/ChatPanel';
 
 
 
-const serverUrl = server;
+const serverUrl = socketServer || server;
 
 
 var connections = {};
@@ -515,51 +515,55 @@ function VideoCall() {
         
 
         :
-        <div className={styles.videoCallContainer}>
-
-          <Controls
-            video={video}
-            audio={audio}
-            screenAvailable={screenAvailable === true}
-            screen={screen}
-            onToggleVideo={handleVideo}
-            onToggleAudio={handleAudio}
-            onToggleScreen={handleScreen}
-            onToggleChat={toggleChat}
-            newMessages={newMessages}
-            onEnd={handleEndCall}
-          />
-          <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', position: 'relative' }}>
-            <div style={{ flex: 1, position: 'relative' }}>
+        <div style={{ 
+          height: '100vh', 
+          backgroundColor: '#202124', 
+          color: '#ffffff', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          overflow: 'hidden',
+          fontFamily: 'Inter, sans-serif'
+        }}>
+          {/* Main workspace (Video Grid + Chat panel side-by-side) */}
+          <div style={{ flex: 1, display: 'flex', position: 'relative', overflow: 'hidden' }}>
+            
+            {/* Video grid area */}
+            <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflowY: 'auto' }}>
               <VideoGrid videos={videos} />
+              
+              {/* Local user video preview floating inside video container */}
               <video
                 ref={localVideoRef}
                 autoPlay
                 muted
                 playsInline
                 style={{
-                  position: 'fixed',
-                  right: isChatVisible ? (360 + 16) : 16,
-                  bottom: 16,
-                  width: 220,
-                  height: 124,
-                  borderRadius: 12,
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.25)',
-                  background: '#000',
+                  position: 'absolute',
+                  right: '16px',
+                  bottom: '16px',
+                  width: '200px',
+                  height: '112px',
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+                  border: '2px solid #5f6368',
+                  background: '#000000',
+                  objectFit: 'cover',
+                  transform: 'scaleX(-1)',
                   zIndex: 5
                 }}
               />
             </div>
+
+            {/* Chat Panel Side Drawer */}
             {isChatVisible && (
               <>
-                {/* Backdrop on small screens to allow tap-to-close */}
                 <div
                   onClick={() => setIsChatVisible(false)}
                   style={{
                     position: 'fixed',
                     inset: 0,
-                    background: 'rgba(0,0,0,0.2)',
-                    zIndex: 5,
+                    background: 'rgba(0,0,0,0.3)',
+                    zIndex: 95,
                     display: window.matchMedia && window.matchMedia('(max-width: 768px)').matches ? 'block' : 'none'
                   }}
                 />
@@ -575,9 +579,41 @@ function VideoCall() {
             )}
           </div>
 
+          {/* Bottom Pinned Controls Bar */}
+          <div style={{ 
+            height: '80px', 
+            borderTop: '1px solid #3c4043', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            padding: '0 24px', 
+            backgroundColor: '#202124', 
+            zIndex: 10 
+          }}>
+            {/* Left section: Meeting Room Code */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '15px', fontWeight: '500', letterSpacing: '0.5px' }}>
+                {window.location.pathname.substring(1)}
+              </span>
+            </div>
 
+            {/* Center section: Main call controls */}
+            <Controls
+              video={video}
+              audio={audio}
+              screenAvailable={screenAvailable === true}
+              screen={screen}
+              onToggleVideo={handleVideo}
+              onToggleAudio={handleAudio}
+              onToggleScreen={handleScreen}
+              onToggleChat={toggleChat}
+              newMessages={newMessages}
+              onEnd={handleEndCall}
+            />
 
-
+            {/* Right section: Blank spacer to balance layout */}
+            <div style={{ width: '120px', display: 'none', md: 'block' }}></div>
+          </div>
         </div>
 
 

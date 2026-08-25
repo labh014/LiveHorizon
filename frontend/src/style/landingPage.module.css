@@ -1,10 +1,324 @@
-
 .landingPageContainer {
-  padding-top: 70px; /* Adjust based on navbar height */
-  /* background: url("/techBackground.webp");
-  background-repeat: no-repeat;
+  font-family: 'Inter', sans-serif;
+  color: #3c4043;
+  background-color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Custom Header Navbar */
+.headerNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 30px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.brand span {
+  font-size: 22px;
+  font-weight: 500;
+  color: #3c4043;
+  letter-spacing: -0.5px;
+}
+
+.brand span strong {
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navTime {
+  font-size: 15px;
+  color: #5f6368;
+}
+
+/* Hero Section */
+.heroSection {
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  padding: 60px 24px;
+}
+
+.heroTitle {
+  font-size: 48px;
+  font-weight: 500;
+  color: #202124;
+  line-height: 1.15;
+  margin-bottom: 18px;
+  letter-spacing: -1px;
+}
+
+.heroTitleHighlight {
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+.heroDesc {
+  font-size: 18px;
+  color: #5f6368;
+  line-height: 1.5;
+  margin-bottom: 40px;
+  max-width: 500px;
+}
+
+/* Actions and Buttons */
+.actionGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.btnPrimary {
+  background-color: #1a73e8;
+  color: #ffffff !important;
+  border: none;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.btnPrimary:hover {
+  background-color: #1557b0;
+  box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+}
+
+.btnOutline {
+  border: 1px solid #dadce0;
+  background-color: #ffffff;
+  color: #1a73e8 !important;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btnOutline:hover {
+  background-color: #f8f9fa;
+  border-color: #cbd0d5;
+}
+
+/* Meeting Code Input Group */
+.codeInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 30px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.inputWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5f6368;
+}
+
+.codeInput {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #3c4043;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.codeInput:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+}
+
+.btnJoin {
+  background: transparent;
+  border: none;
+  color: #1a73e8;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.btnJoin:hover {
+  background-color: rgba(26,115,232,0.06);
+}
+
+.btnJoin:disabled {
+  color: #c2c3c5;
+  cursor: not-allowed;
+}
+
+/* Right Side Video Call Collage Graphic */
+.rightCol {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.collageContainer {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  height: 380px;
+}
+
+/* Video Card Styles */
+.videoCard {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-size: cover;
+  background-position: center;
+  position: absolute;
+}
+
+.nameTag {
+  background-color: rgba(0,0,0,0.55);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 12px;
+  backdrop-filter: blur(4px);
+  align-self: flex-start;
+}
+
+/* Call indicators inside mockup */
+.micIndicator {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(26,115,232,0.9);
   color: white;
-  width: 100vw;
-  height: 100vh; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px;
+  align-self: flex-end;
+}
+
+.micIndicatorMuted {
+  background: #ea4335;
+}
+
+/* Card 1: Main screen (Mother & Kids) */
+.cardMain {
+  width: 78%;
+  height: 75%;
+  top: 10%;
+  left: 0;
+  z-index: 1;
+  background-image: linear-gradient(135deg, rgba(60,64,67,0.3) 0%, rgba(60,64,67,0.8) 100%), url('https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=600&auto=format&fit=crop');
+}
+
+/* Card 2: Overlay Top Right (Smiling Man) */
+.cardOver1 {
+  width: 38%;
+  height: 40%;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  border: 3px solid #ffffff;
+  background-image: linear-gradient(135deg, rgba(60,64,67,0.3) 0%, rgba(60,64,67,0.8) 100%), url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop');
+}
+
+/* Card 3: Overlay Bottom Right (Young Woman) */
+.cardOver2 {
+  width: 38%;
+  height: 40%;
+  bottom: 5%;
+  right: 4%;
+  z-index: 3;
+  border: 3px solid #ffffff;
+  background-image: linear-gradient(135deg, rgba(60,64,67,0.3) 0%, rgba(60,64,67,0.8) 100%), url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop');
+}
+
+/* Clean Mock Call Control Overlay inside collage */
+.controlMock {
+  position: absolute;
+  bottom: 0px;
+  left: 30px;
+  display: flex;
+  gap: 8px;
+  z-index: 4;
+}
+
+.controlBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  color: #3c4043;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.controlBtnDanger {
+  background: #ea4335;
+  color: white;
+}
+
+@media (max-width: 991px) {
+  .heroTitle {
+    font-size: 38px;
+    text-align: center;
+  }
+  .heroDesc {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .actionGroup {
+    justify-content: center;
+  }
+  .codeInputGroup {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .rightCol {
+    margin-top: 50px;
+  }
 }
